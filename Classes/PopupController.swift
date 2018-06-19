@@ -15,6 +15,7 @@ public enum PopupCustomOption {
     case scrollable(Bool)
     case dismissWhenTaps(Bool)
     case movesAlongWithKeyboard(Bool)
+    case layoutChangeDuration(TimeInterval)
 }
 
 typealias PopupAnimateCompletion =  () -> ()
@@ -80,6 +81,7 @@ open class PopupController: UIViewController {
     fileprivate var layout: PopupLayout = .center
     fileprivate var animation: PopupAnimation = .fadeIn
     
+    fileprivate var layoutAnimationDuration: TimeInterval = 0.0
     fileprivate let margin: CGFloat = 16
     fileprivate let baseScrollView = UIScrollView()
     fileprivate var isShowingKeyboard: Bool = false
@@ -114,7 +116,13 @@ open class PopupController: UIViewController {
     
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        updateLayouts()
+        if layoutAnimationDuration > 0 {
+            UIView.animate(withDuration: layoutAnimationDuration) {
+                self.updateLayouts()
+            }
+        } else {
+            self.updateLayouts()
+        }
     }
     
 }
@@ -221,6 +229,8 @@ private extension PopupController {
                 self.dismissWhenTaps = dismiss
             case .movesAlongWithKeyboard(let moves):
                 self.movesAlongWithKeyboard = moves
+            case .layoutChangeDuration(let duration):
+                self.layoutAnimationDuration = duration
             }
         }
     }
